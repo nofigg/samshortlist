@@ -5,6 +5,8 @@ __pycache__/
 .env
 .env.local
 .env.*.local
+venv/
+backend/venv/
 
 # Build outputs
 dist/
