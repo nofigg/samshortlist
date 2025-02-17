@@ -1,54 +1,104 @@
-import { auth } from "@clerk/nextjs";
+"use client";
 
-export default async function OpportunitiesPage() {
-  const { userId } = auth();
+import { useState, useEffect } from 'react';
+import { auth } from "@clerk/nextjs";
+import SearchFilters from '@/components/SearchFilters';
+import OpportunityCard from '@/components/OpportunityCard';
+import SpendingTable from '@/components/SpendingTable';
+import { fetchOpportunities, fetchSpendingData } from '@/services/api';
+import { Opportunity, SpendingRecord, SearchFilters as FilterType } from '@/types/api';
+
+export default function OpportunitiesPage() {
+  const [activeTab, setActiveTab] = useState<'opportunities' | 'spending'>('opportunities');
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+  const [spendingRecords, setSpendingRecords] = useState<SpendingRecord[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState<FilterType>({
+    page: 1,
+    limit: 10,
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        if (activeTab === 'opportunities') {
+          const data = await fetchOpportunities(filters);
+          setOpportunities(data);
+        } else {
+          const data = await fetchSpendingData(filters);
+          setSpendingRecords(data);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [filters, activeTab]);
+
+  const handleFilterChange = (newFilters: FilterType) => {
+    setFilters(newFilters);
+  };
+
+  const handleViewDetails = (id: string) => {
+    // Implement view details logic
+    console.log('View details for:', id);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Subcontracting Opportunities</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Opportunity cards will be populated here */}
-        <div className="border rounded-lg p-4 shadow-sm">
-          <div className="flex justify-between items-start mb-4">
-            <h3 className="text-xl font-semibold">Sample Opportunity</h3>
-            <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Active</span>
-          </div>
-          
-          <div className="space-y-2 text-sm">
-            <p><span className="font-medium">Agency:</span> Department of Defense</p>
-            <p><span className="font-medium">NAICS:</span> 541330</p>
-            <p><span className="font-medium">Value:</span> $500,000</p>
-            <p><span className="font-medium">Deadline:</span> March 1, 2025</p>
-          </div>
-          
-          <div className="mt-4 flex justify-end space-x-2">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-              View Details
-            </button>
-          </div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Federal Opportunities & Spending</h1>
+        <div className="flex space-x-4">
+          <button
+            onClick={() => setActiveTab('opportunities')}
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === 'opportunities'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Opportunities
+          </button>
+          <button
+            onClick={() => setActiveTab('spending')}
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === 'spending'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Spending Data
+          </button>
         </div>
       </div>
-      
-      <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Filters</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">NAICS Code</label>
-            <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-              <option>All NAICS</option>
-              <option>541330 - Engineering Services</option>
-              <option>541511 - Custom Computer Programming</option>
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Agency</label>
-            <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-              <option>All Agencies</option>
-              <option>Department of Defense</option>
-              <option>Department of Energy</option>
-            </select>
+
+      <SearchFilters onFilterChange={handleFilterChange} loading={loading} />
+
+      {activeTab === 'opportunities' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {loading ? (
+            [...Array(6)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-64 bg-gray-100 rounded-lg"></div>
+              </div>
+            ))
+          ) : (
+            opportunities.map((opportunity) => (
+              <OpportunityCard
+                key={opportunity.id}
+                opportunity={opportunity}
+                onViewDetails={handleViewDetails}
+              />
+            ))
+          )}
+        </div>
+      ) : (
+        <SpendingTable records={spendingRecords} loading={loading} />
+      )}
           </div>
           
           <div>
