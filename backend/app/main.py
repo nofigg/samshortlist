@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.endpoints import opportunities, businesses
+from app.api.endpoints import opportunities, businesses, auth
 from app.core.config import get_settings
 from app.db.session import engine
 from app.models import base
@@ -26,6 +26,12 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(
+    auth.router,
+    prefix="/api/v1/auth",
+    tags=["auth"]
+)
+
 app.include_router(
     opportunities.router,
     prefix="/api/v1",

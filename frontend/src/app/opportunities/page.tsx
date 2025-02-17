@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { auth } from "@clerk/nextjs";
 import SearchFilters from '@/components/SearchFilters';
 import OpportunityCard from '@/components/OpportunityCard';
 import SpendingTable from '@/components/SpendingTable';
@@ -99,19 +98,7 @@ export default function OpportunitiesPage() {
       ) : (
         <SpendingTable records={spendingRecords} loading={loading} />
       )}
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Status</label>
-            <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-              <option>All Status</option>
-              <option>Active</option>
-              <option>Upcoming</option>
-              <option>Closed</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      <div>TEST</div>
     </div>
   );
 }

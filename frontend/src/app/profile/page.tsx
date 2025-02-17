@@ -1,7 +1,4 @@
-import { auth } from "@clerk/nextjs";
-
-export default async function ProfilePage() {
-  const { userId } = auth();
+export default function ProfilePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">

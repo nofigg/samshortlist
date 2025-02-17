@@ -13,22 +13,31 @@ export interface Opportunity {
 }
 
 export interface SpendingRecord {
-  awardId: string;
-  recipientName: string;
-  awardAmount: number;
-  description: string;
-  awardType: string;
-  fundingAgency: string;
-  startDate?: string;
-  endDate?: string;
+  award_id: string | null;
+  recipient_name: string | null;
+  total_obligation: number | null;
+  description: string | null;
+  award_type: string | null;
+  awarding_agency_name: string | null;
+  funding_agency_name: string | null;
+  period_of_performance_start_date: string | null;
+  period_of_performance_current_end_date: string | null;
+  period_of_performance_end_date: string | null;
+  place_of_performance_city: string | null;
+  place_of_performance_state: string | null;
+  place_of_performance_zip5: string | null;
 }
 
 export interface SearchFilters {
-  startDate?: string;
-  endDate?: string;
-  keyword?: string;
-  agency?: string;
-  type?: string;
+  start_date: string;
+  end_date: string;
+  keyword: string;
+  award_type: string;
+  agency: string;
+  min_amount?: number;
+  max_amount?: number;
+  sort: string;
+  order: 'asc' | 'desc';
   page: number;
   limit: number;
 }
